@@ -67,17 +67,19 @@ function replaceSpacesWithHyphen(text) {
 
 // Function to generate JSON structure
 function generateJson(name, id, latestVersion, versions) {
+    const datapackNameId = replaceSpacesWithHyphen(name);
+
     const datapackData = {
         "datapack_name": name,
-        "datapack_name_id": replaceSpacesWithHyphen(name), // Only name, spaces replaced with hyphen
+        "datapack_name_id": datapackNameId,
         "datapack_id": id,
         "latest_version": latestVersion,
+        "latest_zip_location": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/${latestVersion}/${name}.zip`,
+        "latest_source": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/sources/${latestVersion}/`,
         "versions": {}
     };
 
-    // Use datapack ID and name for URLs, replacing spaces with hyphens for the name
-    const datapackNameId = replaceSpacesWithHyphen(name);
-
+    // Loop through versions and add to the 'versions' field
     versions.forEach(version => {
         datapackData.versions[version] = {
             "zip_location": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/${version}/${name}.zip`,
