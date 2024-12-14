@@ -4,36 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datapack JSON Generator</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #download-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #error-message {
+            color: red;
+            text-align: center;
+        }
+
+        #json-output {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Datapack JSON Generator</h1>
-<form id="datapack-form">
     <div class="container">
-        <label for="name">Datapack Name:</label>
-        <input type="text" id="name" required><br><br>
+        <h1>Datapack List JSON Generator</h1>
 
-        <label for="id">Datapack ID:</label>
-        <input type="text" id="id" required><br><br>
+        <form id="datapack-form">
+            <div class="form-group">
+                <label for="datapack_name">Datapack Name:</label>
+                <input type="text" id="datapack_name" required>
+            </div>
+            <div class="form-group">
+                <label for="datapack_id">Datapack ID:</label>
+                <input type="text" id="datapack_id" required>
+            </div>
+            <div class="form-group">
+                <label for="latest_version">Latest Version:</label>
+                <input type="text" id="latest_version" required>
+            </div>
+            <div class="form-group">
+                <label for="minecraft_version">Minecraft Version(s) Compatibility (Latest):</label>
+                <input type="text" id="minecraft_version" placeholder="e.g., 1.21.2, 1.21.3" required>
+            </div>
 
-        <label for="latest_version">Latest Version:</label>
-        <input type="text" id="latest_version" required><br><br>
+            <button type="button" id="add-datapack-button" onclick="addDatapack()">Add Datapack</button>
 
-        <label for="minecraft_version">Minecraft Compatibility for Latest Version:</label>
-        <input type="text" id="minecraft_version" placeholder="e.g., 1.21, 1.21.1"><br><br>
+            <button type="submit">Generate JSON</button>
+        </form>
 
-        <div class="error" id="error-message"></div><br>
+        <div id="error-message"></div>
 
-        <button type="submit">Generate JSON</button>
+        <div id="json-output" style="display: none;"></div>
+
+        <div id="download-container" style="display: none; text-align: center;">
+            <a id="download-link" href="#">Download JSON</a>
+        </div>
     </div>
-</form>
 
-<div id="download-container" style="display: none;">
-    <a id="download-link" href="" download="datapack.json">Download JSON</a>
-</div>
+    <script>
+        let datapackList = [];
 
-<script src="script.js"></script>
+        // Add a new datapack entry
+        function addDatapack() {
+            const name = document.getElementById("datapack_name").value.trim();
+            const id = document.getElementById("datapack_id").value.trim();
+            const latestVersion = document.getElementById("latest_version").value.trim();
+            const minecraftCompatibility = document.getElementById("minecraft_version").value.trim().split(",").map(version => version.trim());
+
+            if (!name || !id || !latestVersion || minecraftCompatibility.length === 0) {
+                document.getElementById("error-message").textContent = "All fields are required!";
+                return;
+            }
+
+            // Clear the error message if validation passes
+            document.getElementById("error-message").textContent = "";
+
+            // Generate the zip location URL using the specified method
+            const zipLocation = `https://packfetch.pages.dev/datapacks/get/${id}/${replaceSpacesWithHyphen(name)}/${latestVersion}/${replaceSpacesWithHyphen(name)}.zip`;
+
+            // Add new datapack to the list
+            datapackList.push({
+                "datapack_name": name,
+                "datapack_name_id": replaceSpacesWithHyphen(name),
+                "datapack_id": id,
+                "latest_version": latestVersion,
+                "zip_location": zipLocation,
+                "latest_minecraft_compatibility": minecraftCompatibility
+            });
+
+            // Clear form fields after adding
+            document.getElementById("datapack-form").reset();
+        }
+
+        // Replace spaces with hyphens
+        function replaceSpacesWithHyphen(text) {
+            return text.replace(/\s+/g, '-');
+        }
+
+        // Generate JSON
+        document.getElementById("datapack-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            if (datapackList.length === 0) {
+                document.getElementById("error-message").textContent = "No datapacks added!";
+                return;
+            }
+
+            // Generate the JSON structure
+            const datapackJson = JSON.stringify({
+                "datapack_list": datapackList
+            }, null, 4);
+
+            // Display the JSON output on the page
+            document.getElementById("json-output").textContent = datapackJson;
+            document.getElementById("json-output").style.display = "block";
+
+            // Create the downloadable link
+            const blob = new Blob([datapackJson], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            document.getElementById("download-link").href = url;
+            document.getElementById("download-container").style.display = "block";
+        });
+    </script>
 
 </body>
 </html>
