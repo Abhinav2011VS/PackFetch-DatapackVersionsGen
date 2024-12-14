@@ -23,11 +23,6 @@
         <label for="minecraft_version">Minecraft Compatibility for Latest Version:</label>
         <input type="text" id="minecraft_version" placeholder="e.g., 1.21, 1.21.1"><br><br>
 
-        <div class="container" id="versions-container">
-            <h3>Versions</h3>
-            <div id="version-inputs"></div>
-        </div>
-
         <div class="error" id="error-message"></div><br>
 
         <button type="submit">Generate JSON</button>
@@ -37,9 +32,6 @@
 <div id="download-container" style="display: none;">
     <a id="download-link" href="" download="datapack.json">Download JSON</a>
 </div>
-
-<!-- Floating Add Version Button -->
-<button id="add-version-button" type="button" onclick="addVersion()">+</button>
 
 <script src="script.js"></script>
 
