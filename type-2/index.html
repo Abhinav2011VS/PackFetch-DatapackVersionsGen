@@ -65,6 +65,17 @@
             color: red;
             text-align: center;
         }
+
+        #json-output {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -90,10 +101,6 @@
                 <input type="url" id="zip_location" required>
             </div>
             <div class="form-group">
-                <label for="source">Source URL:</label>
-                <input type="url" id="source" required>
-            </div>
-            <div class="form-group">
                 <label for="versions">Versions URL:</label>
                 <input type="url" id="versions" required>
             </div>
@@ -109,6 +116,8 @@
 
         <div id="error-message"></div>
 
+        <div id="json-output" style="display: none;"></div>
+
         <div id="download-container" style="display: none; text-align: center;">
             <a id="download-link" href="#">Download JSON</a>
         </div>
@@ -123,11 +132,10 @@
             const id = document.getElementById("datapack_id").value.trim();
             const latestVersion = document.getElementById("latest_version").value.trim();
             const zipLocation = document.getElementById("zip_location").value.trim();
-            const source = document.getElementById("source").value.trim();
             const versions = document.getElementById("versions").value.trim();
             const minecraftCompatibility = document.getElementById("minecraft_version").value.trim().split(",").map(version => version.trim());
 
-            if (!name || !id || !latestVersion || !zipLocation || !source || !versions || minecraftCompatibility.length === 0) {
+            if (!name || !id || !latestVersion || !zipLocation || !versions || minecraftCompatibility.length === 0) {
                 document.getElementById("error-message").textContent = "All fields are required!";
                 return;
             }
@@ -142,8 +150,6 @@
                 "datapack_id": id,
                 "latest_version": latestVersion,
                 "zip_location": zipLocation,
-                "source": source,
-                "versions": versions,
                 "latest_minecraft_compatibility": minecraftCompatibility
             });
 
@@ -169,6 +175,10 @@
             const datapackJson = JSON.stringify({
                 "datapack_list": datapackList
             }, null, 4);
+
+            // Display the JSON output on the page
+            document.getElementById("json-output").textContent = datapackJson;
+            document.getElementById("json-output").style.display = "block";
 
             // Create the downloadable link
             const blob = new Blob([datapackJson], { type: "application/json" });
