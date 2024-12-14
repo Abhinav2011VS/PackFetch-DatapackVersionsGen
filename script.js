@@ -12,6 +12,12 @@ function addVersion() {
     versionField.placeholder = "Enter version";
     versionField.required = true;
 
+    // Create Minecraft version input field for each version
+    const minecraftVersionField = document.createElement("input");
+    minecraftVersionField.type = "text";
+    minecraftVersionField.placeholder = "Enter Minecraft versions (comma separated)";
+    minecraftVersionField.required = true;
+
     // Create a remove button for the version input field
     const removeButton = document.createElement("button");
     removeButton.type = "button";
@@ -21,6 +27,7 @@ function addVersion() {
     };
 
     versionInput.appendChild(versionField);
+    versionInput.appendChild(minecraftVersionField);
     versionInput.appendChild(removeButton);
     versionContainer.appendChild(versionInput);
 }
@@ -31,19 +38,25 @@ document.getElementById("datapack-form").addEventListener("submit", function(eve
     const name = document.getElementById("name").value.trim();
     const id = document.getElementById("id").value.trim();
     const latestVersion = document.getElementById("latest_version").value.trim();
-    
-    // Get all versions from dynamically added fields
+    const latestMinecraftCompatibility = document.getElementById("minecraft_version").value.trim().split(",").map(version => version.trim());
+
+    // Get all versions and Minecraft compatibility versions from dynamically added fields
     versions = [];
-    const versionInputs = document.querySelectorAll("#versions-container input");
+    const versionInputs = document.querySelectorAll("#versions-container .version-input");
     versionInputs.forEach(input => {
-        const version = input.value.trim();
-        if (version) {
-            versions.push(version);
+        const version = input.querySelector("input[type='text']:first-of-type").value.trim();
+        const minecraftVersions = input.querySelector("input[type='text']:last-of-type").value.trim().split(",").map(version => version.trim());
+
+        if (version && minecraftVersions.length > 0) {
+            versions.push({
+                version,
+                minecraftVersions
+            });
         }
     });
 
     // Basic validation
-    if (!name || !id || !latestVersion || versions.length === 0) {
+    if (!name || !id || !latestVersion || versions.length === 0 || latestMinecraftCompatibility.length === 0) {
         document.getElementById("error-message").textContent = "All fields are required!";
         return;
     } else {
@@ -51,7 +64,7 @@ document.getElementById("datapack-form").addEventListener("submit", function(eve
     }
 
     // Generate JSON
-    const datapackJson = generateJson(name, id, latestVersion, versions);
+    const datapackJson = generateJson(name, id, latestVersion, latestMinecraftCompatibility, versions);
 
     // Create the downloadable link
     const blob = new Blob([datapackJson], { type: "application/json" });
@@ -66,7 +79,7 @@ function replaceSpacesWithHyphen(text) {
 }
 
 // Function to generate JSON structure
-function generateJson(name, id, latestVersion, versions) {
+function generateJson(name, id, latestVersion, latestMinecraftCompatibility, versions) {
     const datapackNameId = replaceSpacesWithHyphen(name);
 
     const datapackData = {
@@ -76,14 +89,16 @@ function generateJson(name, id, latestVersion, versions) {
         "latest_version": latestVersion,
         "latest_zip_location": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/${latestVersion}/${name}.zip`,
         "latest_source": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/sources/${latestVersion}/`,
+        "latest_minecraft_compatibility": latestMinecraftCompatibility,
         "versions": {}
     };
 
     // Loop through versions and add to the 'versions' field
-    versions.forEach(version => {
+    versions.forEach(({ version, minecraftVersions }) => {
         datapackData.versions[version] = {
             "zip_location": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/${version}/${name}.zip`,
-            "source": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/sources/${version}/`
+            "source": `https://packfetch.pages.dev/datapacks/get/${id}/${datapackNameId}/sources/${version}/`,
+            "minecraft_compatibility": minecraftVersions
         };
     });
 

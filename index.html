@@ -3,51 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datapack Generator</title>
+    <title>Datapack JSON Generator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<h1>Datapack JSON Generator</h1>
+<form id="datapack-form">
     <div class="container">
-        <h1>Datapack Generator</h1>
-        
-        <!-- Form for input -->
-        <form id="datapack-form">
-            <div class="form-group">
-                <label for="name">Datapack Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="id">Datapack ID:</label>
-                <input type="text" id="id" name="id" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="latest_version">Latest Version:</label>
-                <input type="text" id="latest_version" name="latest_version" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="version">Version:</label>
-                <input type="text" id="version" name="version">
-                <button type="button" onclick="addVersion()">Add Version</button>
-            </div>
+        <label for="name">Datapack Name:</label>
+        <input type="text" id="name" required><br><br>
 
-            <div id="versions-container">
-                <!-- Versions will appear here -->
-            </div>
+        <label for="id">Datapack ID:</label>
+        <input type="text" id="id" required><br><br>
 
-            <button type="submit">Generate JSON</button>
-        </form>
+        <label for="latest_version">Latest Version:</label>
+        <input type="text" id="latest_version" required><br><br>
 
-        <div id="error-message"></div>
-        <div id="download-container" style="display: none;">
-            <a id="download-link" href="#" download="datapack.json">
-                <button>Download JSON</button>
-            </a>
+        <label for="minecraft_version">Minecraft Compatibility for Latest Version:</label>
+        <input type="text" id="minecraft_version" placeholder="e.g., 1.21, 1.21.1"><br><br>
+
+        <div class="container" id="versions-container">
+            <h3>Versions</h3>
+            <div id="version-inputs"></div>
         </div>
-    </div>
 
-    <script src="script.js"></script>
+        <div class="error" id="error-message"></div><br>
+
+        <button type="submit">Generate JSON</button>
+    </div>
+</form>
+
+<div id="download-container" style="display: none;">
+    <a id="download-link" href="" download="datapack.json">Download JSON</a>
+</div>
+
+<!-- Floating Add Version Button -->
+<button id="add-version-button" type="button" onclick="addVersion()">+</button>
+
+<script src="script.js"></script>
+
 </body>
 </html>
