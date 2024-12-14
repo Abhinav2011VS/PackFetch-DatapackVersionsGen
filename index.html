@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datapack Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Datapack Generator</h1>
+        
+        <!-- Form for input -->
+        <form id="datapack-form">
+            <div class="form-group">
+                <label for="name">Datapack Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="id">Datapack ID:</label>
+                <input type="text" id="id" name="id" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="latest_version">Latest Version:</label>
+                <input type="text" id="latest_version" name="latest_version" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="version">Version:</label>
+                <input type="text" id="version" name="version">
+                <button type="button" onclick="addVersion()">Add Version</button>
+            </div>
+
+            <div id="versions-container">
+                <!-- Versions will appear here -->
+            </div>
+
+            <button type="submit">Generate JSON</button>
+        </form>
+
+        <div id="error-message"></div>
+        <div id="download-container" style="display: none;">
+            <a id="download-link" href="#" download="datapack.json">
+                <button>Download JSON</button>
+            </a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
